@@ -17,6 +17,16 @@ This component listens to events of cover switches and handles them to calculate
 
 ### Usage
 
+### UI setup (recommended)
+
+1. Install the integration via HACS and restart Home Assistant.
+2. Go to **Settings -> Devices & Services -> Add Integration**.
+3. Search for **Cover Time Based Synced**.
+4. Create one config entry per cover (open switch, close switch, travel times, optional extra times).
+5. Edit values later via **Configure** in the integration card.
+
+YAML setup remains supported for existing installations.
+
 ### Example configuration.yaml entry
 ```yaml
 cover:
