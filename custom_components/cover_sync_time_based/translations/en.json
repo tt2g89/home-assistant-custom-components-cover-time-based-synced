@@ -68,7 +68,7 @@
     },
     "error": {
       "already_configured": "A device with this switch pair already exists.",
-      "unsupported_entity_platform": "Only covers from this integration can be migrated here (not native Loxone covers)."
+      "unsupported_entity_platform": "Only covers created by this integration can be migrated here."
     },
     "abort": {
       "already_configured": "Device is already configured."

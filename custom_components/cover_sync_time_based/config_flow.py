@@ -24,6 +24,24 @@ from .const import (
 )
 
 
+def _extract_device_id(unique_id: str | None) -> str | None:
+    """Extract internal device id from entity unique id."""
+    if not unique_id:
+        return None
+    prefix = "cover_timebased_synced_uuid_"
+    if unique_id.startswith(prefix):
+        return unique_id[len(prefix):]
+    return unique_id
+
+
+def _first_not_none(*values):
+    """Return the first value that is not None."""
+    for value in values:
+        if value is not None:
+            return value
+    return None
+
+
 def _schema_with_defaults(user_input: dict | None = None) -> vol.Schema:
     """Return schema for create/update."""
     user_input = user_input or {}
@@ -81,6 +99,28 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     _migrate_defaults: dict = {}
     _legacy_domain = "cover_time_based_synced"
 
+    def _lookup_yaml_device_config(self, device_id: str | None) -> dict:
+        """Return YAML device config for a known device id, if available."""
+        if not device_id:
+            return {}
+        config = self.hass.config.as_dict()
+        cover_cfg = config.get("cover")
+        platform_sections: list[dict] = []
+        if isinstance(cover_cfg, list):
+            platform_sections = [item for item in cover_cfg if isinstance(item, dict)]
+        elif isinstance(cover_cfg, dict):
+            platform_sections = [cover_cfg]
+
+        for section in platform_sections:
+            if section.get("platform") not in {DOMAIN, self._legacy_domain}:
+                continue
+            devices = section.get("devices")
+            if isinstance(devices, dict) and device_id in devices:
+                candidate = devices[device_id]
+                if isinstance(candidate, dict):
+                    return candidate
+        return {}
+
     async def async_step_user(self, user_input: dict | None = None):
         """Entry menu."""
         return self.async_show_menu(
@@ -113,13 +153,43 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 state = self.hass.states.get(entity_id)
                 attrs = state.attributes if state else {}
+                device_id = _extract_device_id(entity_entry.unique_id if entity_entry else None)
+                yaml_cfg = self._lookup_yaml_device_config(device_id)
                 self._migrate_defaults = {
                     CONF_NAME: attrs.get("friendly_name", entity_id.split(".")[-1]),
-                    CONF_TRAVELLING_TIME_UP: attrs.get(CONF_TRAVELLING_TIME_UP, DEFAULT_TRAVEL_TIME),
-                    CONF_TRAVELLING_TIME_DOWN: attrs.get(CONF_TRAVELLING_TIME_DOWN, DEFAULT_TRAVEL_TIME),
-                    CONF_EXTRA_TIME_OPEN: attrs.get(CONF_EXTRA_TIME_OPEN, DEFAULT_EXTRA_TIME),
-                    CONF_EXTRA_TIME_CLOSE: attrs.get(CONF_EXTRA_TIME_CLOSE, DEFAULT_EXTRA_TIME),
-                    CONF_SEND_STOP_AT_ENDS: attrs.get(CONF_SEND_STOP_AT_ENDS, DEFAULT_SEND_STOP_AT_ENDS),
+                    CONF_OPEN_SWITCH_ENTITY_ID: _first_not_none(
+                        attrs.get(CONF_OPEN_SWITCH_ENTITY_ID),
+                        yaml_cfg.get(CONF_OPEN_SWITCH_ENTITY_ID),
+                    ),
+                    CONF_CLOSE_SWITCH_ENTITY_ID: _first_not_none(
+                        attrs.get(CONF_CLOSE_SWITCH_ENTITY_ID),
+                        yaml_cfg.get(CONF_CLOSE_SWITCH_ENTITY_ID),
+                    ),
+                    CONF_TRAVELLING_TIME_UP: _first_not_none(
+                        attrs.get(CONF_TRAVELLING_TIME_UP),
+                        yaml_cfg.get(CONF_TRAVELLING_TIME_UP),
+                        DEFAULT_TRAVEL_TIME,
+                    ),
+                    CONF_TRAVELLING_TIME_DOWN: _first_not_none(
+                        attrs.get(CONF_TRAVELLING_TIME_DOWN),
+                        yaml_cfg.get(CONF_TRAVELLING_TIME_DOWN),
+                        DEFAULT_TRAVEL_TIME,
+                    ),
+                    CONF_EXTRA_TIME_OPEN: _first_not_none(
+                        attrs.get(CONF_EXTRA_TIME_OPEN),
+                        yaml_cfg.get(CONF_EXTRA_TIME_OPEN),
+                        DEFAULT_EXTRA_TIME,
+                    ),
+                    CONF_EXTRA_TIME_CLOSE: _first_not_none(
+                        attrs.get(CONF_EXTRA_TIME_CLOSE),
+                        yaml_cfg.get(CONF_EXTRA_TIME_CLOSE),
+                        DEFAULT_EXTRA_TIME,
+                    ),
+                    CONF_SEND_STOP_AT_ENDS: _first_not_none(
+                        attrs.get(CONF_SEND_STOP_AT_ENDS),
+                        yaml_cfg.get(CONF_SEND_STOP_AT_ENDS),
+                        DEFAULT_SEND_STOP_AT_ENDS,
+                    ),
                 }
                 return await self.async_step_migrate_cover_config()
 

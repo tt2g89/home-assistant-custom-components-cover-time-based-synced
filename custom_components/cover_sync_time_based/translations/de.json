@@ -68,7 +68,7 @@
     },
     "error": {
       "already_configured": "Für dieses Relais-Paar existiert bereits ein Eintrag.",
-      "unsupported_entity_platform": "Hier können nur Rollos aus dieser Integration migriert werden (keine nativen Loxone-Rollos)."
+      "unsupported_entity_platform": "Hier können nur Rollos migriert werden, die durch diese Integration erstellt wurden."
     },
     "abort": {
       "already_configured": "Dieses Rollo ist bereits konfiguriert."
