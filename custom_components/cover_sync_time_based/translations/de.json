@@ -1,11 +1,15 @@
 {
   "config": {
     "title": "Cover Sync Time Based",
-    "menu_options": {
-      "add_cover": "Neues Rollo anlegen",
-      "migrate_cover": "Bestehendes Rollo migrieren"
-    },
     "step": {
+      "user": {
+        "title": "Cover Sync Time Based",
+        "description": "Wähle, ob du ein neues Rollo anlegen oder eine bestehende Entität migrieren möchtest.",
+        "menu_options": {
+          "add_cover": "Neues Rollo anlegen",
+          "migrate_cover": "Bestehendes Rollo migrieren"
+        }
+      },
       "add_cover": {
         "title": "Cover Sync Time Based",
         "description": "Hier legst du genau ein Rollo an. Weitere Rollos fügst du später über \"Integration hinzufügen\" hinzu.",
