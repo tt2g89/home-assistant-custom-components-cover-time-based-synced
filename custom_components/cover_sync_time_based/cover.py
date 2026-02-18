@@ -322,8 +322,11 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
             attr[CONF_TRAVELLING_TIME_DOWN] = self._travel_time_down
         if self._travel_time_up is not None:
             attr[CONF_TRAVELLING_TIME_UP] = self._travel_time_up 
+        attr[CONF_OPEN_SWITCH_ENTITY_ID] = self._open_switch_entity_id
+        attr[CONF_CLOSE_SWITCH_ENTITY_ID] = self._close_switch_entity_id
         attr[CONF_EXTRA_TIME_OPEN] = self._extra_time_open
         attr[CONF_EXTRA_TIME_CLOSE] = self._extra_time_close
+        attr[CONF_SEND_STOP_AT_ENDS] = self._send_stop_at_ends
         attr[ATTR_UNCONFIRMED_STATE] = str(self._assume_uncertain_position)
         return attr
 
