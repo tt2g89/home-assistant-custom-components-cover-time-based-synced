@@ -3,6 +3,7 @@
   "name": "Cover Time Based Synced",
   "version": "2.3.0",
   "config_flow": true,
+  "single_config_entry": false,
   "documentation": "https://github.com/kotborealis/home-assistant-custom-components-cover-time-based-synced",
   "issue_tracker": "https://github.com/kotborealis/home-assistant-custom-components-cover-time-based-synced/issues",
   "requirements": [],
