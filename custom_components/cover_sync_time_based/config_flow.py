@@ -6,6 +6,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
 
 from .const import (
@@ -78,6 +79,7 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
     _migrate_defaults: dict = {}
+    _legacy_domain = "cover_time_based_synced"
 
     async def async_step_user(self, user_input: dict | None = None):
         """Entry menu."""
@@ -100,19 +102,26 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_migrate_cover(self, user_input: dict | None = None):
         """Select an existing cover entity to migrate into a UI config entry."""
+        errors = {}
         if user_input is not None:
             entity_id = user_input["entity_id"]
-            state = self.hass.states.get(entity_id)
-            attrs = state.attributes if state else {}
-            self._migrate_defaults = {
-                CONF_NAME: attrs.get("friendly_name", entity_id.split(".")[-1]),
-                CONF_TRAVELLING_TIME_UP: attrs.get(CONF_TRAVELLING_TIME_UP, DEFAULT_TRAVEL_TIME),
-                CONF_TRAVELLING_TIME_DOWN: attrs.get(CONF_TRAVELLING_TIME_DOWN, DEFAULT_TRAVEL_TIME),
-                CONF_EXTRA_TIME_OPEN: attrs.get(CONF_EXTRA_TIME_OPEN, DEFAULT_EXTRA_TIME),
-                CONF_EXTRA_TIME_CLOSE: attrs.get(CONF_EXTRA_TIME_CLOSE, DEFAULT_EXTRA_TIME),
-                CONF_SEND_STOP_AT_ENDS: attrs.get(CONF_SEND_STOP_AT_ENDS, DEFAULT_SEND_STOP_AT_ENDS),
-            }
-            return await self.async_step_migrate_cover_config()
+            registry = er.async_get(self.hass)
+            entity_entry = registry.async_get(entity_id)
+            platform = entity_entry.platform if entity_entry else None
+            if platform not in {DOMAIN, self._legacy_domain}:
+                errors["base"] = "unsupported_entity_platform"
+            else:
+                state = self.hass.states.get(entity_id)
+                attrs = state.attributes if state else {}
+                self._migrate_defaults = {
+                    CONF_NAME: attrs.get("friendly_name", entity_id.split(".")[-1]),
+                    CONF_TRAVELLING_TIME_UP: attrs.get(CONF_TRAVELLING_TIME_UP, DEFAULT_TRAVEL_TIME),
+                    CONF_TRAVELLING_TIME_DOWN: attrs.get(CONF_TRAVELLING_TIME_DOWN, DEFAULT_TRAVEL_TIME),
+                    CONF_EXTRA_TIME_OPEN: attrs.get(CONF_EXTRA_TIME_OPEN, DEFAULT_EXTRA_TIME),
+                    CONF_EXTRA_TIME_CLOSE: attrs.get(CONF_EXTRA_TIME_CLOSE, DEFAULT_EXTRA_TIME),
+                    CONF_SEND_STOP_AT_ENDS: attrs.get(CONF_SEND_STOP_AT_ENDS, DEFAULT_SEND_STOP_AT_ENDS),
+                }
+                return await self.async_step_migrate_cover_config()
 
         return self.async_show_form(
             step_id="migrate_cover",
@@ -126,6 +135,7 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     )
                 }
             ),
+            errors=errors,
         )
 
     async def async_step_migrate_cover_config(self, user_input: dict | None = None):
