@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Cover Sync Time Based",
+        "description": "Create a UI-managed cover device.",
+        "data": {
+          "name": "Name",
+          "open_switch_entity_id": "Open switch entity",
+          "close_switch_entity_id": "Close switch entity",
+          "travelling_time_up": "Travel time up (seconds)",
+          "travelling_time_down": "Travel time down (seconds)",
+          "extra_time_open": "Extra open time (seconds)",
+          "extra_time_close": "Extra close time (seconds)",
+          "send_stop_at_ends": "Send stop command at end positions"
+        }
+      }
+    },
+    "error": {
+      "already_configured": "A device with this switch pair already exists."
+    },
+    "abort": {
+      "already_configured": "Device is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Edit Cover Settings",
+        "data": {
+          "name": "Name",
+          "open_switch_entity_id": "Open switch entity",
+          "close_switch_entity_id": "Close switch entity",
+          "travelling_time_up": "Travel time up (seconds)",
+          "travelling_time_down": "Travel time down (seconds)",
+          "extra_time_open": "Extra open time (seconds)",
+          "extra_time_close": "Extra close time (seconds)",
+          "send_stop_at_ends": "Send stop command at end positions"
+        }
+      }
+    }
+  }
+}

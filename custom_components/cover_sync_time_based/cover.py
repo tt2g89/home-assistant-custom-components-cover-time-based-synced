@@ -8,6 +8,7 @@ from datetime import timedelta
 from homeassistant.core import callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import async_track_utc_time_change, async_track_time_interval
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_POSITION,
@@ -27,23 +28,26 @@ from homeassistant.helpers.restore_state import RestoreEntity
 
 from .travelcalculator import TravelCalculator
 from .travelcalculator import TravelStatus
+from .const import (
+    DOMAIN,
+    CONF_TRAVELLING_TIME_DOWN,
+    CONF_TRAVELLING_TIME_UP,
+    CONF_EXTRA_TIME_OPEN,
+    CONF_EXTRA_TIME_CLOSE,
+    CONF_SEND_STOP_AT_ENDS,
+    CONF_OPEN_SWITCH_ENTITY_ID,
+    CONF_CLOSE_SWITCH_ENTITY_ID,
+    DEFAULT_TRAVEL_TIME,
+    DEFAULT_EXTRA_TIME,
+    DEFAULT_SEND_STOP_AT_ENDS,
+)
 
 _LOGGER = logging.getLogger(__name__)
+_SERVICES_REGISTERED = False
 
 CONF_DEVICES = 'devices'
 CONF_NAME = 'name'
 CONF_ALIASES = 'aliases'
-CONF_TRAVELLING_TIME_DOWN = 'travelling_time_down'
-CONF_TRAVELLING_TIME_UP = 'travelling_time_up'
-CONF_EXTRA_TIME_OPEN = 'extra_time_open'
-CONF_EXTRA_TIME_CLOSE = 'extra_time_close'
-CONF_SEND_STOP_AT_ENDS = 'send_stop_at_ends'
-DEFAULT_TRAVEL_TIME = 25
-DEFAULT_EXTRA_TIME = 0
-DEFAULT_SEND_STOP_AT_ENDS = False
-
-CONF_OPEN_SWITCH_ENTITY_ID = 'open_switch_entity_id'
-CONF_CLOSE_SWITCH_ENTITY_ID = 'close_switch_entity_id'
 ATTR_CONFIDENT = 'confident'
 ATTR_POSITION = 'position'
 ATTR_ACTION = 'action'
@@ -92,8 +96,6 @@ ACTION_SCHEMA = vol.Schema(
 )
 
 
-DOMAIN = "cover_sync_time_based"
-
 def devices_from_config(domain_config):
     """Parse configuration and add cover devices."""
     devices = []
@@ -125,16 +127,52 @@ def devices_from_config(domain_config):
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up the cover platform."""
     async_add_entities(devices_from_config(config))
+    _register_entity_services()
 
+
+async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
+    """Set up a cover from config entry (UI-based configuration)."""
+    data = {**entry.data, **entry.options}
+    name = data[CONF_NAME]
+    travel_time_down = int(data.get(CONF_TRAVELLING_TIME_DOWN, DEFAULT_TRAVEL_TIME))
+    travel_time_up = int(data.get(CONF_TRAVELLING_TIME_UP, DEFAULT_TRAVEL_TIME))
+    extra_time_open = float(data.get(CONF_EXTRA_TIME_OPEN, DEFAULT_EXTRA_TIME))
+    extra_time_close = float(data.get(CONF_EXTRA_TIME_CLOSE, DEFAULT_EXTRA_TIME))
+    open_switch_entity_id = data[CONF_OPEN_SWITCH_ENTITY_ID]
+    close_switch_entity_id = data[CONF_CLOSE_SWITCH_ENTITY_ID]
+    send_stop_at_ends = bool(data.get(CONF_SEND_STOP_AT_ENDS, DEFAULT_SEND_STOP_AT_ENDS))
+
+    async_add_entities(
+        [
+            CoverTimeBased(
+                entry.entry_id,
+                name,
+                travel_time_down,
+                travel_time_up,
+                extra_time_open,
+                extra_time_close,
+                open_switch_entity_id,
+                close_switch_entity_id,
+                send_stop_at_ends,
+            )
+        ]
+    )
+    _register_entity_services()
+
+
+def _register_entity_services():
+    """Register integration services for all cover entities."""
+    global _SERVICES_REGISTERED
+    if _SERVICES_REGISTERED:
+        return
     platform = entity_platform.current_platform.get()
-
     platform.async_register_entity_service(
         SERVICE_SET_KNOWN_POSITION, POSITION_SCHEMA, "set_known_position"
     )
-
     platform.async_register_entity_service(
         SERVICE_SET_KNOWN_ACTION, ACTION_SCHEMA, "set_known_action"
     )
+    _SERVICES_REGISTERED = True
 
 
 class CoverTimeBased(CoverEntity, RestoreEntity):
@@ -277,7 +315,7 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
         return "cover_timebased_synced_uuid_" + self._unique_id
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         attr = {}
         if self._travel_time_down is not None:

@@ -5,6 +5,14 @@ modified to sync state of cover with the state of switches.
 
 ### Usage
 
+### UI setup (recommended)
+
+1. Install via HACS and restart Home Assistant.
+2. Add integration: **Cover Time Based Synced**.
+3. Create one config entry per cover.
+
+YAML setup remains supported.
+
 ### Example configuration.yaml entry
 ```yaml
 cover:
