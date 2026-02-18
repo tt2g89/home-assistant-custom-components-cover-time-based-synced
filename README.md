@@ -5,6 +5,18 @@
 Cover Time Based Component for your [Home-Assistant](http://www.home-assistant.io) based on [davidramosweb's Cover Time Based Component](https://github.com/davidramosweb/home-assistant-custom-components-cover-time-based) and [nagyrobi's Cover RF Time based](https://github.com/nagyrobi/home-assistant-custom-components-cover-rf-time-based/),
 modified to sync state of cover with the state of switches.
 
+## Credits and Fork Context
+
+This repository is an actively maintained fork:
+- Upstream sync-focused implementation by **@kotborealis**:  
+  https://github.com/kotborealis/home-assistant-custom-components-cover-time-based-synced
+
+Huge kudos for the synced behavior foundation.  
+On top of that, this fork adds and refines:
+- configurable extra end-run timing (`extra_time_open`, `extra_time_close`)
+- UI-based configuration via Home Assistant Integrations (Config Flow + Options)
+- migration-oriented UX for moving existing covers into UI-managed entries
+
 ## What does `synced` mean?
 
 In the original implementations, covers are supposed to be controller only via Home Assistant.

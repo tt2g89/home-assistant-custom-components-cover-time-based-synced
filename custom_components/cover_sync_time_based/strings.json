@@ -1,11 +1,15 @@
 {
   "config": {
     "title": "Cover Sync Time Based",
-    "menu_options": {
-      "add_cover": "Add new cover",
-      "migrate_cover": "Migrate existing cover"
-    },
     "step": {
+      "user": {
+        "title": "Cover Sync Time Based",
+        "description": "Select whether you want to create a new cover or migrate an existing one.",
+        "menu_options": {
+          "add_cover": "Add new cover",
+          "migrate_cover": "Migrate existing cover"
+        }
+      },
       "add_cover": {
         "title": "Cover Sync Time Based",
         "description": "Create one cover entry. To add more covers later, run \"Add Integration\" again.",
