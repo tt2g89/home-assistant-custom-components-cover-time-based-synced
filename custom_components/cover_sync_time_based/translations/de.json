@@ -1,0 +1,100 @@
+{
+  "config": {
+    "title": "Cover Sync Time Based",
+    "menu_options": {
+      "add_cover": "Neues Rollo anlegen",
+      "migrate_cover": "Bestehendes Rollo migrieren"
+    },
+    "step": {
+      "add_cover": {
+        "title": "Cover Sync Time Based",
+        "description": "Hier legst du genau ein Rollo an. Weitere Rollos fügst du später über \"Integration hinzufügen\" hinzu.",
+        "data": {
+          "name": "Rolloname",
+          "open_switch_entity_id": "Relais für Auf",
+          "close_switch_entity_id": "Relais für Ab",
+          "travelling_time_up": "Fahrzeit nach oben (Sekunden)",
+          "travelling_time_down": "Fahrzeit nach unten (Sekunden)",
+          "extra_time_open": "Zusatzlaufzeit bei komplett Offen",
+          "extra_time_close": "Zusatzlaufzeit bei komplett Geschlossen",
+          "send_stop_at_ends": "STOP an Endposition senden"
+        },
+        "data_description": {
+          "name": "Anzeigename der Cover-Entität in Home Assistant.",
+          "open_switch_entity_id": "Schalter/Relais, das den Motor in Öffnungsrichtung fährt.",
+          "close_switch_entity_id": "Schalter/Relais, das den Motor in Schließrichtung fährt.",
+          "travelling_time_up": "Gemessene Laufzeit von komplett zu bis komplett offen, ohne Sicherheitszuschlag.",
+          "travelling_time_down": "Gemessene Laufzeit von komplett offen bis komplett zu, ohne Sicherheitszuschlag.",
+          "extra_time_open": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Öffnen (Position 100) addiert wird.",
+          "extra_time_close": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Schließen (Position 0) addiert wird.",
+          "send_stop_at_ends": "Aktivieren, wenn deine Relaissteuerung an Endlagen ein explizites STOP-Signal benötigt."
+        }
+      },
+      "migrate_cover": {
+        "title": "Bestehendes Rollo migrieren",
+        "description": "Wähle eine bestehende Cover-Entität und vervollständige dann die Relais-Zuordnung. Dadurch wird ein neuer UI-verwalteter Eintrag erzeugt.",
+        "data": {
+          "entity_id": "Bestehende Cover-Entität"
+        }
+      },
+      "migrate_cover_config": {
+        "title": "Migrations-Zuordnung",
+        "description": "Prüfe die Werte und ordne Auf/Ab-Relais zu. Danach kannst du die alte YAML-Konfiguration für dieses Rollo entfernen.",
+        "data": {
+          "name": "Rolloname",
+          "open_switch_entity_id": "Relais für Auf",
+          "close_switch_entity_id": "Relais für Ab",
+          "travelling_time_up": "Fahrzeit nach oben (Sekunden)",
+          "travelling_time_down": "Fahrzeit nach unten (Sekunden)",
+          "extra_time_open": "Zusatzlaufzeit bei komplett Offen",
+          "extra_time_close": "Zusatzlaufzeit bei komplett Geschlossen",
+          "send_stop_at_ends": "STOP an Endposition senden"
+        },
+        "data_description": {
+          "name": "Anzeigename der Cover-Entität in Home Assistant.",
+          "open_switch_entity_id": "Schalter/Relais, das den Motor in Öffnungsrichtung fährt.",
+          "close_switch_entity_id": "Schalter/Relais, das den Motor in Schließrichtung fährt.",
+          "travelling_time_up": "Gemessene Laufzeit von komplett zu bis komplett offen, ohne Sicherheitszuschlag.",
+          "travelling_time_down": "Gemessene Laufzeit von komplett offen bis komplett zu, ohne Sicherheitszuschlag.",
+          "extra_time_open": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Öffnen (Position 100) addiert wird.",
+          "extra_time_close": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Schließen (Position 0) addiert wird.",
+          "send_stop_at_ends": "Aktivieren, wenn deine Relaissteuerung an Endlagen ein explizites STOP-Signal benötigt."
+        }
+      }
+    },
+    "error": {
+      "already_configured": "Für dieses Relais-Paar existiert bereits ein Eintrag."
+    },
+    "abort": {
+      "already_configured": "Dieses Rollo ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Rollo-Einstellungen bearbeiten",
+        "description": "Passe Zeiten und Schalterzuordnung an. Änderungen gelten für zukünftige Fahrten.",
+        "data": {
+          "name": "Rolloname",
+          "open_switch_entity_id": "Relais für Auf",
+          "close_switch_entity_id": "Relais für Ab",
+          "travelling_time_up": "Fahrzeit nach oben (Sekunden)",
+          "travelling_time_down": "Fahrzeit nach unten (Sekunden)",
+          "extra_time_open": "Zusatzlaufzeit bei komplett Offen",
+          "extra_time_close": "Zusatzlaufzeit bei komplett Geschlossen",
+          "send_stop_at_ends": "STOP an Endposition senden"
+        },
+        "data_description": {
+          "name": "Anzeigename der Cover-Entität in Home Assistant.",
+          "open_switch_entity_id": "Schalter/Relais, das den Motor in Öffnungsrichtung fährt.",
+          "close_switch_entity_id": "Schalter/Relais, das den Motor in Schließrichtung fährt.",
+          "travelling_time_up": "Gemessene Laufzeit von komplett zu bis komplett offen, ohne Sicherheitszuschlag.",
+          "travelling_time_down": "Gemessene Laufzeit von komplett offen bis komplett zu, ohne Sicherheitszuschlag.",
+          "extra_time_open": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Öffnen (Position 100) addiert wird.",
+          "extra_time_close": "Optionaler Zuschlag in Sekunden, der nur bei vollständigem Schließen (Position 0) addiert wird.",
+          "send_stop_at_ends": "Aktivieren, wenn deine Relaissteuerung an Endlagen ein explizites STOP-Signal benötigt."
+        }
+      }
+    }
+  }
+}

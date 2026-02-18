@@ -23,7 +23,9 @@ This component listens to events of cover switches and handles them to calculate
 2. Go to **Settings -> Devices & Services -> Add Integration**.
 3. Search for **Cover Time Based Synced**.
 4. Create one config entry per cover (open switch, close switch, travel times, optional extra times).
-5. Edit values later via **Configure** in the integration card.
+5. Add additional covers any time by running **Add Integration** again.
+6. Edit values later via **Configure** in the integration card.
+7. For existing covers, use the migration flow in setup menu: **Migrate existing cover**.
 
 YAML setup remains supported for existing installations.
 
