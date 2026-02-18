@@ -92,7 +92,7 @@ ACTION_SCHEMA = vol.Schema(
 )
 
 
-DOMAIN = "cover_time_based_synced"
+DOMAIN = "cover_sync_time_based"
 
 def devices_from_config(domain_config):
     """Parse configuration and add cover devices."""

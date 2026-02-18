@@ -20,7 +20,7 @@ This component listens to events of cover switches and handles them to calculate
 ### Example configuration.yaml entry
 ```yaml
 cover:
-  - platform: cover_time_based_synced
+  - platform: cover_sync_time_based
     devices:
       my_room_cover_time_based:
         name: My Room Cover
