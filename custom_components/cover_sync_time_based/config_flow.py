@@ -77,9 +77,18 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for cover_sync_time_based."""
 
     VERSION = 1
+    _migrate_defaults: dict = {}
 
     async def async_step_user(self, user_input: dict | None = None):
-        """Handle first step."""
+        """Entry menu."""
+        return self.async_show_menu(
+            step_id="user",
+            menu_options=["add_cover", "migrate_cover"],
+            sort=True,
+        )
+
+    async def async_step_add_cover(self, user_input: dict | None = None):
+        """Create a new cover entry from scratch."""
         if user_input is not None:
             await self.async_set_unique_id(
                 f"{user_input[CONF_OPEN_SWITCH_ENTITY_ID]}::{user_input[CONF_CLOSE_SWITCH_ENTITY_ID]}"
@@ -87,7 +96,51 @@ class CoverSyncTimeBasedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
 
-        return self.async_show_form(step_id="user", data_schema=_schema_with_defaults())
+        return self.async_show_form(step_id="add_cover", data_schema=_schema_with_defaults())
+
+    async def async_step_migrate_cover(self, user_input: dict | None = None):
+        """Select an existing cover entity to migrate into a UI config entry."""
+        if user_input is not None:
+            entity_id = user_input["entity_id"]
+            state = self.hass.states.get(entity_id)
+            attrs = state.attributes if state else {}
+            self._migrate_defaults = {
+                CONF_NAME: attrs.get("friendly_name", entity_id.split(".")[-1]),
+                CONF_TRAVELLING_TIME_UP: attrs.get(CONF_TRAVELLING_TIME_UP, DEFAULT_TRAVEL_TIME),
+                CONF_TRAVELLING_TIME_DOWN: attrs.get(CONF_TRAVELLING_TIME_DOWN, DEFAULT_TRAVEL_TIME),
+                CONF_EXTRA_TIME_OPEN: attrs.get(CONF_EXTRA_TIME_OPEN, DEFAULT_EXTRA_TIME),
+                CONF_EXTRA_TIME_CLOSE: attrs.get(CONF_EXTRA_TIME_CLOSE, DEFAULT_EXTRA_TIME),
+                CONF_SEND_STOP_AT_ENDS: attrs.get(CONF_SEND_STOP_AT_ENDS, DEFAULT_SEND_STOP_AT_ENDS),
+            }
+            return await self.async_step_migrate_cover_config()
+
+        return self.async_show_form(
+            step_id="migrate_cover",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("entity_id"): selector.EntitySelector(
+                        selector.EntitySelectorConfig(
+                            domain=["cover"],
+                            multiple=False,
+                        )
+                    )
+                }
+            ),
+        )
+
+    async def async_step_migrate_cover_config(self, user_input: dict | None = None):
+        """Create config entry from selected existing cover plus relay mapping."""
+        if user_input is not None:
+            await self.async_set_unique_id(
+                f"{user_input[CONF_OPEN_SWITCH_ENTITY_ID]}::{user_input[CONF_CLOSE_SWITCH_ENTITY_ID]}"
+            )
+            self._abort_if_unique_id_configured()
+            return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+
+        return self.async_show_form(
+            step_id="migrate_cover_config",
+            data_schema=_schema_with_defaults(self._migrate_defaults),
+        )
 
     @staticmethod
     def async_get_options_flow(config_entry):

@@ -1,9 +1,45 @@
 {
   "config": {
+    "title": "Cover Sync Time Based",
+    "menu_options": {
+      "add_cover": "Add new cover",
+      "migrate_cover": "Migrate existing cover"
+    },
     "step": {
-      "user": {
+      "add_cover": {
         "title": "Cover Sync Time Based",
         "description": "Create one cover entry. To add more covers later, run \"Add Integration\" again.",
+        "data": {
+          "name": "Cover name",
+          "open_switch_entity_id": "Relay for opening",
+          "close_switch_entity_id": "Relay for closing",
+          "travelling_time_up": "Travel time upward (seconds)",
+          "travelling_time_down": "Travel time downward (seconds)",
+          "extra_time_open": "Additional runtime at fully open",
+          "extra_time_close": "Additional runtime at fully closed",
+          "send_stop_at_ends": "Send STOP at end position"
+        },
+        "data_description": {
+          "name": "Display name used for the created cover entity.",
+          "open_switch_entity_id": "Switch that drives the motor in opening direction.",
+          "close_switch_entity_id": "Switch that drives the motor in closing direction.",
+          "travelling_time_up": "Measured runtime from fully closed to fully open, without extra reserve.",
+          "travelling_time_down": "Measured runtime from fully open to fully closed, without extra reserve.",
+          "extra_time_open": "Optional safety reserve in seconds, applied only to full OPEN commands (position 100).",
+          "extra_time_close": "Optional safety reserve in seconds, applied only to full CLOSE commands (position 0).",
+          "send_stop_at_ends": "Enable if your relay setup requires an explicit STOP pulse after reaching end positions."
+        }
+      },
+      "migrate_cover": {
+        "title": "Migrate Existing Cover",
+        "description": "Select an existing cover entity and then complete relay mapping. This creates a new UI-managed entry.",
+        "data": {
+          "entity_id": "Existing cover entity"
+        }
+      },
+      "migrate_cover_config": {
+        "title": "Migration Mapping",
+        "description": "Review values and assign open/close relays. After creating this entry, you can remove old YAML config for that cover.",
         "data": {
           "name": "Cover name",
           "open_switch_entity_id": "Relay for opening",
