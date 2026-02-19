@@ -4,6 +4,7 @@ import logging
 import voluptuous as vol
 
 from datetime import timedelta
+from time import monotonic
 
 from homeassistant.core import callback
 from homeassistant.helpers import entity_platform
@@ -200,6 +201,7 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
         self._target_position = 0
         self._processing_known_position = False
         self._internal_command_in_progress = False
+        self._ignore_off_off_until = 0.0
         self._unique_id = device_id
 
         if name:
@@ -255,6 +257,9 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
             return
 
         if self._switch_open_state == "off" and self._switch_close_state == "off":
+            if monotonic() < self._ignore_off_off_until:
+                _LOGGER.debug(self._name + ': ' + 'open/close: off/off ignored (internal relay transition)')
+                return
             _LOGGER.debug(self._name + ': ' + 'open/close: off/off, stopping')
             self._handle_my_button()
         elif self._switch_open_state == "on" and self._switch_close_state == "on":
@@ -433,7 +438,6 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
     def stop_auto_updater(self):
         """Stop the autoupdater."""
         _LOGGER.debug(self._name + ': ' + 'stop_auto_updater')
-        self._target_position = 0
         if self._unsubscribe_auto_updater is not None:
             self._unsubscribe_auto_updater()
             self._unsubscribe_auto_updater = None
@@ -511,12 +515,14 @@ class CoverTimeBased(CoverEntity, RestoreEntity):
             if command == "close_cover":
                 cmd = "DOWN"
                 self._state = False
+                self._ignore_off_off_until = monotonic() + 0.35
                 await self.hass.services.async_call("homeassistant", "turn_off", {"entity_id": self._open_switch_entity_id}, False)
                 await self.hass.services.async_call("homeassistant", "turn_on", {"entity_id": self._close_switch_entity_id}, False)
 
             elif command == "open_cover":
                 cmd = "UP"
                 self._state = True
+                self._ignore_off_off_until = monotonic() + 0.35
                 await self.hass.services.async_call("homeassistant", "turn_off", {"entity_id": self._close_switch_entity_id}, False)
                 await self.hass.services.async_call("homeassistant", "turn_on", {"entity_id": self._open_switch_entity_id}, False)
 
